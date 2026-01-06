@@ -1,796 +1,470 @@
-import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import "./App.css";
-
-function App() {
-  const controls = useAnimation();
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.3 });
-  const [navScrolled, setNavScrolled] = useState(false);
-  const [activeProject, setActiveProject] = useState(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setNavScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (inView) {
-      controls.start("visible");
-    }
-  }, [controls, inView]);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  // Smooth scroll function
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80; // Navbar height
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-      setIsMobileMenuOpen(false);
-    }
-  };
-
-  const skillList = [
-    { skill: "HTML", percent: 90, color: "#E34F26" },
-    { skill: "CSS", percent: 85, color: "#1572B6" },
-    { skill: "JavaScript", percent: 80, color: "#F7DF1E" },
-    { skill: "ReactJS", percent: 85, color: "#61DAFB" },
-    { skill: "Git & GitHub", percent: 80, color: "#F05032" },
-    { skill: "Java", percent: 80, color: "#007396" },
-    { skill: "DBMS", percent: 95, color: "#4479A1" },
-    { skill: "Tailwind CSS", percent: 75, color: "#38B2AC" },
-  ];
-
-  const projects = [
-    { 
-      title: "Portfolio Website", 
-      desc: "React-based personal portfolio showcasing skills and projects with animations.",
-      tech: ["React", "Framer Motion", "CSS3"],
-      github: "https://github.com/DharaniSB/portfolio",
-      demo: "#"
-    },
-    { 
-      title: "Weather App", 
-      desc: "Responsive weather forecast app using API and React with real-time updates.",
-      tech: ["React", "API", "Chart.js"],
-      github: "https://github.com/DharaniSB/weather-app",
-      demo: "#"
-    },
-    { 
-      title: "To-Do App", 
-      desc: "Interactive to-do list app with local storage integration and drag-drop features.",
-      tech: ["React", "Local Storage", "Material-UI"],
-      github: "https://github.com/DharaniSB/todo-app",
-      demo: "#"
-    },
-    { 
-      title: "E-Commerce UI", 
-      desc: "Modern e-commerce interface with cart functionality and product filtering.",
-      tech: ["React", "Redux", "Stripe"],
-      github: "https://github.com/DharaniSB/ecommerce-ui",
-      demo: "#"
-    }
-  ];
-
-  const timelineData = [
-    { year: '2022', title: 'Started Web Development', desc: 'Began learning HTML, CSS, JavaScript' },
-    { year: '2023', title: 'Mastered React', desc: 'Built multiple React projects and apps' },
-    { year: '2024', title: 'Open Source Contributions', desc: 'Contributed to various open-source projects' },
-    { year: '2025', title: 'Full-Stack Development', desc: 'Working with Node.js, Express, MongoDB' }
-  ];
-
-  const floatingIcons = ["💻", "🚀", "⚛️", "🎨", "🔧", "💡"];
-
-  return (
-    <div className="app">
-      {/* Floating Background Elements */}
-      <div className="floating-icons">
-        {floatingIcons.map((icon, index) => (
-          <motion.div
-            key={index}
-            className="floating-icon"
-            initial={{ y: 0 }}
-            animate={{ 
-              y: [0, -20, 0],
-              rotate: [0, 360]
-            }}
-            transition={{
-              duration: 3 + index,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: index * 0.5
-            }}
-          >
-            {icon}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Particle Background */}
-      <div className="particles">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="particle"
-            initial={{
-              x: Math.random() * 100 + 'vw',
-              y: Math.random() * 100 + 'vh'
-            }}
-            animate={{
-              x: [
-                Math.random() * 100 + 'vw',
-                Math.random() * 100 + 'vw',
-                Math.random() * 100 + 'vw'
-              ],
-              y: [
-                Math.random() * 100 + 'vh',
-                Math.random() * 100 + 'vh',
-                Math.random() * 100 + 'vh'
-              ]
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Navbar */}
-      <motion.nav 
-        className={`navbar ${navScrolled ? 'scrolled' : ''} ${isMobileMenuOpen ? 'menu-open' : ''}`}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div 
-          className="logo"
-          whileHover={{ scale: 1.05, rotate: -5 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          onClick={() => scrollToSection('home')}
-          style={{ cursor: 'pointer' }}
-        >
-          <span>D</span>harani<span>S.</span>
-        </motion.div>
-
-        {/* Theme Toggle Button */}
-        <motion.button 
-          className="theme-toggle"
-          onClick={() => setDarkMode(!darkMode)}
-          whileTap={{ scale: 0.9 }}
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </motion.button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dharani S. | Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">Dharani<span>S.</span></div>
         
-        <ul className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
-          {["home", "about", "skills", "timeline", "projects", "contact"].map((item, index) => (
-            <motion.li 
-              key={item}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.1 }}
-            >
-              <button 
-                className="nav-link-btn"
-                onClick={() => scrollToSection(item)}
-              >
-                {item.charAt(0).toUpperCase() + item.slice(1)}
-              </button>
-            </motion.li>
-          ))}
+        <div class="theme-toggle" id="themeToggle">
+            <span class="theme-icon">🌙</span>
+        </div>
+        
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home" class="nav-link">Home</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#skills" class="nav-link">Skills</a></li>
+            <li><a href="#timeline" class="nav-link">Timeline</a></li>
+            <li><a href="#projects" class="nav-link">Projects</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
-
-        <motion.button 
-          className="mobile-menu-btn"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          whileTap={{ scale: 0.9 }}
-        >
-          <motion.div
-            animate={isMobileMenuOpen ? "open" : "closed"}
-            variants={{
-              open: { rotate: 45 },
-              closed: { rotate: 0 }
-            }}
-          >
-            ☰
-          </motion.div>
-        </motion.button>
-      </motion.nav>
-
-      {/* Hero Section */}
-      <section id="home" className="hero">
-        <motion.div
-          className="hero-bg"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, type: "spring" }}
-        />
         
-        <motion.h1
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="hero-title"
-        >
-          Hi, I'm <motion.span 
-            className="gradient-text"
-            animate={{ 
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >Dharani Shanmuganathan</motion.span>
-        </motion.h1>
-        
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1.5 }}
-          className="hero-subtitle"
-        >
-          Frontend Developer | ReactJS Enthusiast | UI/UX Designer
-        </motion.p>
-        
-        <motion.div
-          className="hero-badges"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-        >
-          {["React", "JavaScript", "CSS3", "Responsive Design"].map((badge, index) => (
-            <motion.span 
-              key={badge} 
-              className="badge"
-              whileHover={{ scale: 1.1, y: -5 }}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 1.2 + index * 0.1, type: "spring" }}
-            >
-              {badge}
-            </motion.span>
-          ))}
-        </motion.div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <span class="menu-icon">☰</span>
+        </button>
+    </nav>
 
-        <motion.div className="hero-buttons">
-          <motion.button
-            className="btn primary-btn"
-            onClick={() => scrollToSection('projects')}
-            whileHover={{ 
-              scale: 1.1,
-              boxShadow: "0 10px 25px var(--shadow-color)"
-            }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 1.5 }}
-          >
-            View My Work
-          </motion.button>
-          
-          <motion.button
-            className="btn secondary-btn"
-            onClick={() => scrollToSection('contact')}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 1.7 }}
-          >
-            Hire Me
-          </motion.button>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          className="scroll-indicator"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <div className="mouse">
-            <div className="wheel"></div>
-          </div>
-          <span>Scroll</span>
-        </motion.div>
-      </section>
-
-      {/* About Section */}
-      <motion.section
-        id="about"
-        className="section"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          About <span className="highlight">Me</span>
-        </motion.h2>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-bg"></div>
         
-        <div className="about-content">
-          <div className="about-text">
-            <motion.div
-              className="about-card"
-              initial={{ x: -100, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h3>My Journey</h3>
-              <p>
-                I am a passionate web developer who loves creating modern and responsive web applications. 
-                My journey began with HTML/CSS and evolved into mastering React and modern JavaScript.
-              </p>
-            </motion.div>
-            
-            <motion.div
-              className="about-card"
-              initial={{ x: 100, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <h3>My Passion</h3>
-              <p>
-                Experimenting with different frameworks, solving problems, and building interactive projects motivates me every day. 
-                I aim to deliver seamless and engaging user experiences.
-              </p>
-            </motion.div>
-            
-            <motion.div
-              className="about-card"
-              initial={{ y: 50, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <h3>My Vision</h3>
-              <p>
-                To create digital solutions that not only look beautiful but also solve real-world problems 
-                efficiently and effectively.
-              </p>
-            </motion.div>
-          </div>
-          
-          <motion.div 
-            className="about-stats"
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            {[
-              { number: "2+", label: "Years Experience" },
-              { number: "5+", label: "Projects Completed" },
-              { number: "2", label: "Internships done" },
-              { number: "100%", label: "Passion" }
-            ].map((stat, index) => (
-              <motion.div 
-                key={stat.label}
-                className="stat"
-                whileHover={{ scale: 1.1, y: -5 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + index * 0.1 }}
-              >
-                <h4>{stat.number}</h4>
-                <p>{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+        <h1 class="hero-title">
+            Hi, I'm <span class="gradient-text">Dharani Shanmuganathan</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+            Frontend Developer | ReactJS Enthusiast | UI/UX Designer
+        </p>
+        
+        <div class="hero-badges">
+            <span class="badge">React</span>
+            <span class="badge">JavaScript</span>
+            <span class="badge">CSS3</span>
+            <span class="badge">Responsive Design</span>
         </div>
-      </motion.section>
 
-      {/* Skills Section */}
-      <section id="skills" className="section dark">
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          My <span className="highlight">Skills</span>
-        </motion.h2>
-        
-        <div className="skills-grid" ref={ref}>
-          {skillList.map((item, index) => (
-            <motion.div 
-              key={item.skill} 
-              className="skill-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="skill-header">
-                <span>{item.skill}</span>
-                <motion.span 
-                  className="skill-percent"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  {item.percent}%
-                </motion.span>
-              </div>
-              
-              <div className="skill-bar-container">
-                <motion.div
-                  className="progress"
-                  style={{ backgroundColor: item.color }}
-                  initial={{ width: 0 }}
-                  animate={controls}
-                  variants={{
-                    visible: { 
-                      width: `${item.percent}%`,
-                      transition: { 
-                        duration: 1.5,
-                        ease: "easeOut",
-                        delay: index * 0.1 
-                      }
-                    }
-                  }}
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Timeline Section */}
-      <motion.section 
-        id="timeline" 
-        className="section"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          My <span className="highlight">Journey</span>
-        </motion.h2>
-        
-        <div className="timeline">
-          {timelineData.map((item, index) => (
-            <motion.div 
-              key={item.year}
-              className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-            >
-              <div className="timeline-content">
-                <div className="timeline-year">{item.year}</div>
-                <h3>{item.title}</h3>
-                <p>{item.desc}</p>
-              </div>
-              <div className="timeline-dot"></div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Projects Section */}
-      <motion.section
-        id="projects"
-        className="section"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          Featured <span className="highlight">Projects</span>
-        </motion.h2>
-        
-        <div className="projects-grid">
-          <AnimatePresence>
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.title}
-                className="project-card"
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ 
-                  y: -10,
-                  transition: { duration: 0.3 }
-                }}
-                onMouseEnter={() => setActiveProject(index)}
-                onMouseLeave={() => setActiveProject(null)}
-              >
-                <motion.div 
-                  className="project-image"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="project-number">0{index + 1}</div>
-                  <div className="project-overlay">
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: activeProject === index ? 1 : 0 }}
-                      className="project-links"
-                    >
-                      <a href={project.github} className="project-link" target="_blank" rel="noopener noreferrer">
-                        <i className="fab fa-github"></i>
-                      </a>
-                      <a href={project.demo} className="project-link">
-                        <i className="fas fa-external-link-alt"></i>
-                      </a>
-                    </motion.div>
-                  </div>
-                </motion.div>
-                
-                <div className="project-content">
-                  <h3>{project.title}</h3>
-                  <p>{project.desc}</p>
-                  
-                  <motion.div 
-                    className="project-tech"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    {project.tech.map(tech => (
-                      <span key={tech} className="tech-tag">{tech}</span>
-                    ))}
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </motion.section>
-
-      {/* Contact Section */}
-      <motion.section
-        id="contact"
-        className="section dark"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          Let's <span className="highlight">Connect</span>
-        </motion.h2>
-        
-        <div className="contact-container">
-          <motion.div 
-            className="contact-info"
-            initial={{ x: -50, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h3>Get in Touch</h3>
-            <div className="contact-items">
-              <motion.div 
-                className="contact-item"
-                whileHover={{ x: 10 }}
-              >
-                <i className="fas fa-envelope"></i>
-                <div>
-                  <h4>Email</h4>
-                  <p>dharani@example.com</p>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                className="contact-item"
-                whileHover={{ x: 10 }}
-              >
-                <i className="fab fa-github"></i>
-                <div>
-                  <h4>GitHub</h4>
-                  <a href="https://github.com/DharaniSB" target="_blank" rel="noreferrer">
-                    github.com/DharaniSB
-                  </a>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                className="contact-item"
-                whileHover={{ x: 10 }}
-              >
-                <i className="fas fa-map-marker-alt"></i>
-                <div>
-                  <h4>Location</h4>
-                  <p>Coimbatore, India</p>
-                </div>
-              </motion.div>
-
-              <motion.div 
-                className="contact-item"
-                whileHover={{ x: 10 }}
-              >
-                <i className="fas fa-phone"></i>
-                <div>
-                  <h4>Phone</h4>
-                  <p>+91 98765 43210</p>
-                </div>
-              </motion.div>
-            </div>
-            
-            <div className="social-links">
-              {["linkedin", "twitter", "codepen", "instagram"].map((platform) => (
-                <motion.a
-                  key={platform}
-                  href="#"
-                  className="social-link"
-                  whileHover={{ scale: 1.2, y: -5 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <i className={`fab fa-${platform}`}></i>
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-          
-          <motion.form 
-            className="contact-form"
-            initial={{ x: 50, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert('Message sent! (Demo)');
-            }}
-          >
-            <motion.div 
-              className="form-group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <input type="text" placeholder="Your Name" required />
-            </motion.div>
-            
-            <motion.div 
-              className="form-group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <input type="email" placeholder="Your Email" required />
-            </motion.div>
-            
-            <motion.div 
-              className="form-group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <textarea placeholder="Your Message" rows="5" required></textarea>
-            </motion.div>
-            
-            <motion.button 
-              type="submit" 
-              className="btn primary-btn"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              Send Message
-              <i className="fas fa-paper-plane"></i>
-            </motion.button>
-          </motion.form>
-        </div>
-      </motion.section>
-
-      {/* Footer */}
-      <motion.footer 
-        className="footer"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
-        <motion.div className="footer-content">
-          <motion.p
-            animate={{ opacity: [1, 0.7, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            © {new Date().getFullYear()} Dharani Shanmuganathan. All rights reserved.
-          </motion.p>
-          
-          <motion.div 
-            className="footer-links"
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-          >
-            <button 
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="footer-link"
-            >
-              Back to Top
+        <div class="hero-buttons">
+            <button class="btn primary-btn" onclick="scrollToSection('projects')">
+                View My Work
             </button>
-            <span className="divider">|</span>
-            <button className="footer-link">Privacy Policy</button>
-            <span className="divider">|</span>
-            <button className="footer-link">Terms of Service</button>
-          </motion.div>
-        </motion.div>
-      </motion.footer>
+            <button class="btn secondary-btn" onclick="scrollToSection('contact')">
+                Hire Me
+            </button>
+        </div>
 
-      {/* Back to Top Button */}
-      <AnimatePresence>
-        {navScrolled && (
-          <motion.button
-            className="back-to-top"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <i className="fas fa-arrow-up"></i>
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator" onclick="scrollToSection('about')">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <span>Scroll</span>
+        </div>
+    </section>
 
-export default App;
-/* App.css - Complete Enhanced Portfolio Styles */
-/* Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Roboto+Slab:wght@300;400;500;600;700&display=swap');
+    <!-- About Section -->
+    <section id="about" class="section">
+        <h2>About <span class="highlight">Me</span></h2>
+        
+        <div class="about-content">
+            <div class="about-text">
+                <div class="about-card">
+                    <h3>My Journey</h3>
+                    <p>
+                        I am a passionate web developer who loves creating modern and responsive web applications. 
+                        My journey began with HTML/CSS and evolved into mastering React and modern JavaScript.
+                    </p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>My Passion</h3>
+                    <p>
+                        Experimenting with different frameworks, solving problems, and building interactive projects motivates me every day. 
+                        I aim to deliver seamless and engaging user experiences.
+                    </p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>My Vision</h3>
+                    <p>
+                        To create digital solutions that not only look beautiful but also solve real-world problems 
+                        efficiently and effectively.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="about-stats">
+                <div class="stat">
+                    <h4>2+</h4>
+                    <p>Years Experience</p>
+                </div>
+                <div class="stat">
+                    <h4>5+</h4>
+                    <p>Projects Completed</p>
+                </div>
+                <div class="stat">
+                    <h4>2</h4>
+                    <p>Internships done</p>
+                </div>
+                <div class="stat">
+                    <h4>100%</h4>
+                    <p>Passion</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    <!-- Skills Section -->
+    <section id="skills" class="section dark">
+        <h2>My <span class="highlight">Skills</span></h2>
+        
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>HTML</span>
+                    <span class="skill-percent">90%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 90%; background-color: #E34F26;"></div>
+                </div>
+            </div>
+            
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>CSS</span>
+                    <span class="skill-percent">85%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 85%; background-color: #1572B6;"></div>
+                </div>
+            </div>
+            
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>JavaScript</span>
+                    <span class="skill-percent">80%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 80%; background-color: #F7DF1E;"></div>
+                </div>
+            </div>
+            
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>ReactJS</span>
+                    <span class="skill-percent">85%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 85%; background-color: #61DAFB;"></div>
+                </div>
+            </div>
+            
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>Git & GitHub</span>
+                    <span class="skill-percent">80%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 80%; background-color: #F05032;"></div>
+                </div>
+            </div>
+            
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>Java</span>
+                    <span class="skill-percent">80%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 80%; background-color: #007396;"></div>
+                </div>
+            </div>
+            
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span>DBMS</span>
+                    <span class="skill-percent">95%</span>
+                </div>
+                <div class="skill-bar-container">
+                    <div class="progress" style="width: 95%; background-color: #4479A1;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- Timeline Section -->
+    <section id="timeline" class="section">
+        <h2>My <span class="highlight">Journey</span></h2>
+        
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <div class="timeline-year">2022</div>
+                    <h3>Started Web Development</h3>
+                    <p>Began learning HTML, CSS, JavaScript</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+            
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <div class="timeline-year">2023</div>
+                    <h3>Mastered React</h3>
+                    <p>Built multiple React projects and apps</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+            
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <div class="timeline-year">2024</div>
+                    <h3>Open Source Contributions</h3>
+                    <p>Contributed to various open-source projects</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+            
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <div class="timeline-year">2025</div>
+                    <h3>Full-Stack Development</h3>
+                    <p>Working with Node.js, Express, MongoDB</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <h2>Featured <span class="highlight">Projects</span></h2>
+        
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-number">01</div>
+                    <div class="project-overlay">
+                        <div class="project-links">
+                            <a href="https://github.com/DharaniSB/portfolio" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="project-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-content">
+                    <h3>Portfolio Website</h3>
+                    <p>React-based personal portfolio showcasing skills and projects with animations.</p>
+                    
+                    <div class="project-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Framer Motion</span>
+                        <span class="tech-tag">CSS3</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-number">02</div>
+                    <div class="project-overlay">
+                        <div class="project-links">
+                            <a href="https://github.com/DharaniSB/weather-app" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="project-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-content">
+                    <h3>Weather App</h3>
+                    <p>Responsive weather forecast app using API and React with real-time updates.</p>
+                    
+                    <div class="project-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">API</span>
+                        <span class="tech-tag">Chart.js</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-number">03</div>
+                    <div class="project-overlay">
+                        <div class="project-links">
+                            <a href="https://github.com/DharaniSB/todo-app" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="project-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-content">
+                    <h3>To-Do App</h3>
+                    <p>Interactive to-do list app with local storage integration and drag-drop features.</p>
+                    
+                    <div class="project-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Local Storage</span>
+                        <span class="tech-tag">Material-UI</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-number">04</div>
+                    <div class="project-overlay">
+                        <div class="project-links">
+                            <a href="https://github.com/DharaniSB/ecommerce-ui" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="project-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-content">
+                    <h3>E-Commerce UI</h3>
+                    <p>Modern e-commerce interface with cart functionality and product filtering.</p>
+                    
+                    <div class="project-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Redux</span>
+                        <span class="tech-tag">Stripe</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section dark">
+        <h2>Let's <span class="highlight">Connect</span></h2>
+        
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Get in Touch</h3>
+                <div class="contact-items">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p>dharani@example.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fab fa-github"></i>
+                        <div>
+                            <h4>GitHub</h4>
+                            <a href="https://github.com/DharaniSB" target="_blank">
+                                github.com/DharaniSB
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Location</h4>
+                            <p>Coimbatore, India</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Phone</h4>
+                            <p>+91 98765 43210</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-codepen"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <input type="text" placeholder="Your Name" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" placeholder="Your Email" required>
+                </div>
+                
+                <div class="form-group">
+                    <textarea placeholder="Your Message" rows="5" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn primary-btn">
+                    Send Message
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p id="currentYear">© 2024 Dharani Shanmuganathan. All rights reserved.</p>
+            
+            <div class="footer-links">
+                <button class="footer-link" onclick="scrollToTop()">Back to Top</button>
+                <span class="divider">|</span>
+                <button class="footer-link">Privacy Policy</button>
+                <span class="divider">|</span>
+                <button class="footer-link">Terms of Service</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+/* style.css - Complete Portfolio Styles */
 :root {
+  /* Light Theme Colors */
   --bg-primary: #ffffff;
   --bg-secondary: #f8f9fa;
   --text-primary: #333333;
@@ -802,12 +476,10 @@ export default App;
   --shadow: rgba(0, 0, 0, 0.1);
   --shadow-color: rgba(30, 136, 229, 0.3);
   --gradient: linear-gradient(135deg, #1e88e5, #8e24aa);
-  --success: #4caf50;
-  --danger: #f44336;
-  --warning: #ff9800;
 }
 
 .dark {
+  /* Dark Theme Colors */
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
   --text-primary: #f1f5f9;
@@ -820,92 +492,21 @@ export default App;
   --shadow-color: rgba(96, 165, 250, 0.3);
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body, html {
   margin: 0;
   padding: 0;
   font-family: 'Poppins', sans-serif;
   scroll-behavior: smooth;
   overflow-x: hidden;
-  background: var(--bg-primary);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.app {
-  position: relative;
-  width: 100vw;
-  min-height: 100vh;
-}
-
-/* Floating Icons */
-.floating-icons {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.floating-icon {
-  position: absolute;
-  font-size: 2rem;
-  opacity: 0.1;
-  user-select: none;
-  filter: drop-shadow(0 0 10px var(--accent-light));
-}
-
-/* Particles */
-.particles {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 50%;
-  opacity: 0.3;
-}
-
-/* Loading Overlay */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.loader {
-  text-align: center;
-}
-
-.loader-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 /* Navbar */
@@ -917,8 +518,8 @@ body, html {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  background: rgba(var(--card-bg), 0.95);
+  width: 100%;
+  background-color: var(--card-bg);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 20px var(--shadow);
   z-index: 1000;
@@ -927,58 +528,63 @@ body, html {
 
 .navbar.scrolled {
   padding: 1rem 4rem;
-  background: var(--card-bg);
-  box-shadow: 0 5px 30px var(--shadow);
+  background-color: var(--card-bg);
 }
 
 .logo {
   font-weight: 800;
   font-size: 2rem;
   cursor: pointer;
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
+.logo span {
+  color: var(--text-primary);
+}
+
+/* Theme Toggle */
 .theme-toggle {
-  background: var(--accent);
+  background: var(--gradient);
   color: white;
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   margin: 0 2rem;
+  box-shadow: 0 4px 15px var(--shadow-color);
 }
 
 .theme-toggle:hover {
   transform: scale(1.1);
-  box-shadow: 0 5px 15px var(--shadow-color);
+  box-shadow: 0 6px 20px var(--shadow-color);
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
-.nav-links a {
-  text-decoration: none;
+.nav-link {
+  background: none;
+  border: none;
   color: var(--text-primary);
+  text-decoration: none;
   font-weight: 500;
-  position: relative;
-  padding: 0.5rem 0;
+  font-size: 1rem;
   cursor: pointer;
-  transition: color 0.3s;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-.nav-links a::after {
+.nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -989,12 +595,12 @@ body, html {
   transition: width 0.3s ease;
 }
 
-.nav-links a:hover::after,
-.nav-links a.active::after {
+.nav-link:hover::after,
+.nav-link.active::after {
   width: 100%;
 }
 
-.nav-links a:hover {
+.nav-link:hover {
   color: var(--accent);
 }
 
@@ -1010,16 +616,15 @@ body, html {
 /* Hero Section */
 .hero {
   min-height: 100vh;
-  width: 100vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   text-align: center;
-  padding: 6rem 2rem 4rem;
+  padding: 8rem 2rem 4rem;
+  background: var(--bg-secondary);
   position: relative;
   overflow: hidden;
-  background: var(--bg-secondary);
 }
 
 .hero-bg {
@@ -1032,89 +637,30 @@ body, html {
   opacity: 0.1;
 }
 
-/* Terminal - FIXED POSITIONING */
-.terminal-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-  position: relative;
-  z-index: 5;
-}
-
-.terminal {
-  background: var(--card-bg);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px var(--shadow);
-}
-
-.terminal-header {
-  background: var(--bg-secondary);
-  padding: 0.8rem 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-
-.terminal-dots {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.dot.red { background: #ff5f56; }
-.dot.yellow { background: #ffbd2e; }
-.dot.green { background: #27c93f; }
-
-.terminal-body {
-  padding: 1.5rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  text-align: left;
-  min-height: 120px;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.terminal-line {
-  margin-bottom: 0.5rem;
-  animation: fadeIn 0.5s ease;
-}
-
-.typing-cursor {
-  display: inline-block;
-  width: 8px;
-  height: 16px;
-  background: var(--accent);
-  margin-left: 5px;
-  animation: blink 1s infinite;
-}
-
 .hero-title {
-  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 800;
-  line-height: 1.2;
   margin-bottom: 1rem;
-  position: relative;
+  color: var(--text-primary);
 }
 
 .gradient-text {
-  background: linear-gradient(90deg, var(--accent), #8e24aa, var(--accent));
-  background-size: 200% auto;
+  background: var(--gradient);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   display: inline-block;
+  background-size: 200% auto;
+  animation: gradient 3s ease-in-out infinite;
+}
+
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .hero-subtitle {
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-size: 1.5rem;
   color: var(--text-secondary);
   margin-bottom: 2rem;
   max-width: 600px;
@@ -1141,6 +687,7 @@ body, html {
 .badge:hover {
   border-color: var(--accent);
   background: var(--card-bg);
+  transform: translateY(-2px);
 }
 
 .hero-buttons {
@@ -1157,12 +704,12 @@ body, html {
   font-weight: 600;
   font-size: 1.1rem;
   cursor: pointer;
-  text-decoration: none;
+  border: none;
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  transition: all 0.3s;
-  border: none;
 }
 
 .primary-btn {
@@ -1188,17 +735,13 @@ body, html {
   transform: translateY(-3px);
 }
 
-/* Scroll Indicator - FIXED POSITIONING */
 .scroll-indicator {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 4rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  z-index: 10;
+  cursor: pointer;
 }
 
 .mouse {
@@ -1207,8 +750,6 @@ body, html {
   border: 2px solid var(--accent);
   border-radius: 20px;
   position: relative;
-  display: flex;
-  justify-content: center;
 }
 
 .wheel {
@@ -1218,23 +759,28 @@ body, html {
   border-radius: 2px;
   position: absolute;
   top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   animation: scrollWheel 2s infinite;
 }
 
+@keyframes scrollWheel {
+  0%, 100% { transform: translate(-50%, 0); opacity: 1; }
+  50% { transform: translate(-50%, 10px); opacity: 0.5; }
+}
+
 .scroll-indicator span {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  margin-top: 0.5rem;
 }
 
 /* Sections */
 .section {
   padding: 8rem 2rem;
-  width: 100vw;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease;
 }
 
 .section.dark {
@@ -1244,12 +790,10 @@ body, html {
 }
 
 h2 {
-  font-family: 'Roboto Slab', serif;
-  font-size: 3.5rem;
-  font-weight: 700;
+  font-size: 3rem;
   text-align: center;
   margin-bottom: 4rem;
-  position: relative;
+  color: var(--text-primary);
 }
 
 .highlight {
@@ -1264,13 +808,6 @@ h2 {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 4rem;
-  align-items: start;
-}
-
-.about-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
 }
 
 .about-card {
@@ -1278,7 +815,9 @@ h2 {
   padding: 2rem;
   border-radius: 20px;
   box-shadow: 0 10px 30px var(--shadow);
-  transition: all 0.3s;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
 }
 
 .about-card:hover {
@@ -1289,7 +828,6 @@ h2 {
 .about-card h3 {
   color: var(--accent);
   margin-bottom: 1rem;
-  font-size: 1.5rem;
 }
 
 .about-card p {
@@ -1308,30 +846,24 @@ h2 {
   padding: 1.5rem;
   background: var(--accent-light);
   border-radius: 15px;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
 }
 
 .stat:hover {
-  background: var(--accent);
-  transform: scale(1.05);
-}
-
-.stat:hover h4,
-.stat:hover p {
-  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px var(--shadow);
 }
 
 .stat h4 {
   font-size: 2.5rem;
   color: var(--accent);
   margin-bottom: 0.5rem;
-  transition: color 0.3s;
 }
 
 .stat p {
   color: var(--text-secondary);
   font-weight: 500;
-  transition: color 0.3s;
 }
 
 /* Skills Section */
@@ -1340,7 +872,7 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   max-width: 1000px;
-  margin: 0 auto 4rem;
+  margin: 0 auto;
 }
 
 .skill-card {
@@ -1348,7 +880,8 @@ h2 {
   padding: 1.5rem;
   border-radius: 15px;
   box-shadow: 0 5px 15px var(--shadow);
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
 }
 
 .skill-card:hover {
@@ -1361,6 +894,10 @@ h2 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.skill-header span {
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -1378,64 +915,13 @@ h2 {
 
 .progress {
   height: 100%;
+  background: var(--gradient);
   border-radius: 5px;
   position: relative;
+  transition: width 1.5s ease;
 }
 
-.progress::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: shimmer 2s infinite;
-}
-
-/* Skills Visualizer */
-.skills-visualizer {
-  margin-top: 4rem;
-  text-align: center;
-}
-
-.skills-visualizer h3 {
-  margin-bottom: 2rem;
-  color: var(--text-primary);
-}
-
-.skills-circles {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-}
-
-.skill-circle {
-  text-align: center;
-}
-
-.circle-progress {
-  position: relative;
-  width: 100px;
-  height: 100px;
-}
-
-.circle-progress svg {
-  transform: rotate(-90deg);
-}
-
-.circle-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-}
-
-/* Timeline Section */
+/* Timeline */
 .timeline {
   position: relative;
   max-width: 800px;
@@ -1471,11 +957,12 @@ h2 {
   padding: 1.5rem;
   border-radius: 10px;
   box-shadow: 0 5px 15px var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .timeline-year {
   display: inline-block;
-  background: var(--accent);
+  background: var(--gradient);
   color: white;
   padding: 0.3rem 1rem;
   border-radius: 20px;
@@ -1500,7 +987,7 @@ h2 {
   height: 20px;
   background: var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px var(--bg-secondary);
+  box-shadow: 0 0 0 4px var(--bg-primary);
 }
 
 .timeline-item.left .timeline-dot {
@@ -1511,7 +998,7 @@ h2 {
   left: -10px;
 }
 
-/* Projects Section */
+/* Projects */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1524,7 +1011,8 @@ h2 {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 30px var(--shadow);
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
 }
 
 .project-card:hover {
@@ -1533,13 +1021,9 @@ h2 {
 }
 
 .project-image {
-  position: relative;
   height: 200px;
   background: var(--gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  position: relative;
 }
 
 .project-number {
@@ -1564,6 +1048,10 @@ h2 {
   gap: 1.5rem;
   opacity: 0;
   transition: opacity 0.3s;
+}
+
+.project-card:hover .project-overlay {
+  opacity: 1;
 }
 
 .project-links {
@@ -1591,18 +1079,13 @@ h2 {
   transform: scale(1.1);
 }
 
-.project-card:hover .project-overlay {
-  opacity: 1;
-}
-
 .project-content {
   padding: 2rem;
 }
 
 .project-content h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
   color: var(--text-primary);
+  margin-bottom: 1rem;
 }
 
 .project-content p {
@@ -1615,6 +1098,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .tech-tag {
@@ -1626,7 +1110,7 @@ h2 {
   font-weight: 500;
 }
 
-/* Contact Section */
+/* Contact */
 .contact-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1636,16 +1120,8 @@ h2 {
 }
 
 .contact-info h3 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
   color: var(--text-primary);
-}
-
-.contact-items {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .contact-item {
@@ -1655,30 +1131,24 @@ h2 {
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 15px;
-  border-left: 4px solid var(--accent);
-  transition: all 0.3s;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
 .contact-item:hover {
-  background: rgba(255, 255, 255, 0.1);
   transform: translateX(10px);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .contact-item i {
   font-size: 1.5rem;
   color: var(--accent);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(96, 165, 250, 0.1);
-  border-radius: 10px;
 }
 
 .contact-item h4 {
-  font-size: 1rem;
   color: var(--text-secondary);
+  font-size: 0.9rem;
   margin-bottom: 0.3rem;
 }
 
@@ -1686,7 +1156,6 @@ h2 {
 .contact-item a {
   color: var(--text-primary);
   text-decoration: none;
-  font-weight: 500;
 }
 
 .contact-item a:hover {
@@ -1696,6 +1165,7 @@ h2 {
 .social-links {
   display: flex;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
 .social-link {
@@ -1707,543 +1177,5 @@ h2 {
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
-  font-size: 1.2rem;
   text-decoration: none;
-  transition: all 0.3s;
-}
-
-.social-link:hover {
-  background: var(--accent);
-  color: white;
-  transform: translateY(-5px);
-}
-
-/* Contact Form */
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  position: relative;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-primary);
-  font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
-  transition: all 0.3s;
-  resize: none;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-  background: rgba(96, 165, 250, 0.05);
-}
-
-.form-group textarea {
-  height: 150px;
-}
-
-.form-group label {
-  position: absolute;
-  top: 1.2rem;
-  left: 1.2rem;
-  color: var(--text-secondary);
-  pointer-events: none;
-  transition: all 0.3s;
-}
-
-.form-group input:focus + label,
-.form-group input:not(:placeholder-shown) + label,
-.form-group textarea:focus + label,
-.form-group textarea:not(:placeholder-shown) + label {
-  top: -0.8rem;
-  left: 0.8rem;
-  font-size: 0.9rem;
-  color: var(--accent);
-  background: var(--bg-secondary);
-  padding: 0 0.5rem;
-}
-
-.contact-form button {
-  align-self: flex-start;
-  margin-top: 1rem;
-  padding: 1rem 2.5rem;
-  background: var(--gradient);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  transition: all 0.3s;
-}
-
-.contact-form button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px var(--shadow-color);
-}
-
-.contact-form button i {
-  font-size: 1rem;
-  transition: transform 0.3s;
-}
-
-.contact-form button:hover i {
-  transform: translateX(5px);
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 3rem 2rem;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  position: relative;
-  overflow: hidden;
-}
-
-.footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.footer p {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.footer-links a {
-  color: var(--text-primary);
-  text-decoration: none;
-  font-weight: 500;
-  position: relative;
-  padding: 0.5rem 0;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.footer-links a:hover {
-  color: var(--accent);
-}
-
-.divider {
-  color: var(--text-secondary);
-  font-size: 1.2rem;
-}
-
-/* Back to Top Button */
-.back-to-top {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 50px;
-  height: 50px;
-  background: var(--gradient);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 5px 20px var(--shadow-color);
-  z-index: 1000;
-  transition: all 0.3s;
-}
-
-.back-to-top:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px var(--shadow-color);
-}
-
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes scrollWheel {
-  0%, 100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(10px);
-    opacity: 0.5;
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .navbar {
-    padding: 1.5rem 2rem;
-  }
-  
-  .nav-links {
-    gap: 1.5rem;
-  }
-  
-  .about-content {
-    grid-template-columns: 1fr;
-  }
-  
-  .contact-container {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-  
-  .timeline::before {
-    left: 30px;
-  }
-  
-  .timeline-item {
-    width: calc(100% - 80px);
-    left: 80px;
-  }
-  
-  .timeline-item.right {
-    left: 80px;
-  }
-  
-  .timeline-item.left .timeline-dot,
-  .timeline-item.right .timeline-dot {
-    left: -40px;
-  }
-  
-  .hero {
-    padding: 5rem 2rem 3rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 1rem;
-  }
-  
-  .mobile-menu-btn {
-    display: block;
-  }
-  
-  .nav-links {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    background: var(--card-bg);
-    flex-direction: column;
-    padding: 2rem;
-    box-shadow: 0 10px 30px var(--shadow);
-    transform: translateY(-100%);
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 999;
-  }
-  
-  .nav-links.active {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-    margin: 2rem 0;
-  }
-  
-  .hero-badges {
-    margin: 1.5rem 0;
-  }
-  
-  .projects-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .skills-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .skills-circles {
-    gap: 1rem;
-  }
-  
-  h2 {
-    font-size: 2.5rem;
-  }
-  
-  .section {
-    padding: 4rem 1rem;
-  }
-  
-  .about-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .theme-toggle {
-    margin: 0 1rem;
-  }
-  
-  .terminal-container {
-    max-width: 95%;
-    margin: 0 auto 1.5rem;
-  }
-  
-  .hero {
-    padding: 4rem 1rem 2rem;
-    justify-content: flex-start;
-  }
-  
-  .hero-title {
-    font-size: 2.2rem;
-    margin: 0.5rem 0;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-    margin: 0.5rem 0 1rem;
-  }
-  
-  .btn {
-    padding: 0.9rem 2rem;
-    width: 100%;
-    max-width: 250px;
-    justify-content: center;
-  }
-  
-  .scroll-indicator {
-    bottom: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 1.8rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1rem;
-  }
-  
-  .btn {
-    padding: 0.8rem 1.8rem;
-    font-size: 1rem;
-  }
-  
-  .about-card {
-    padding: 1.5rem;
-  }
-  
-  .project-content {
-    padding: 1.5rem;
-  }
-  
-  .contact-item {
-    flex-direction: column;
-    text-align: center;
-    padding: 1rem;
-  }
-  
-  .contact-item i {
-    margin-bottom: 0.5rem;
-  }
-  
-  .footer-links {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .divider {
-    display: none;
-  }
-  
-  .terminal {
-    font-size: 0.8rem;
-  }
-  
-  .terminal-body {
-    padding: 1rem;
-    min-height: 100px;
-  }
-  
-  .hero-badges {
-    gap: 0.5rem;
-  }
-  
-  .badge {
-    padding: 0.4rem 1rem;
-    font-size: 0.9rem;
-  }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-light);
-}
-
-/* Selection Color */
-::selection {
-  background: rgba(96, 165, 250, 0.3);
-  color: white;
-}
-
-/* Focus States */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Utility Classes */
-.text-gradient {
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.shadow-lg {
-  box-shadow: 0 10px 30px var(--shadow);
-}
-
-.shadow-xl {
-  box-shadow: 0 20px 40px var(--shadow);
-}
-
-.rounded-full {
-  border-radius: 9999px;
-}
-
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.grid-center {
-  display: grid;
-  place-items: center;
-}
-
-/* Loading States */
-.loading-state {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* Print Styles */
-@media print {
-  .navbar,
-  .hero-buttons,
-  .back-to-top,
-  .contact-form button,
-  .theme-toggle,
-  .scroll-indicator,
-  .terminal-container,
-  .floating-icons,
-  .particles {
-    display: none !important;
-  }
-  
-  .section {
-    padding: 2rem 0;
-    break-inside: avoid;
-  }
-  
-  body {
-    color: black;
-    background: white;
-  }
-  
-  .hero {
-    min-height: auto;
-    padding-top: 0;
-  }
-  
-  .hero-bg {
-    display: none;
-  }
-}
+  transition: all 
